@@ -9,7 +9,7 @@ from datetime import datetime, timezone
 
 # ── Configuração da página ──────────────────────────────────────────────────
 st.set_page_config(
-    page_title="BonaIntelli | Odds Brasileirão",
+    page_title="BonaIntelli | Odds Brasileirão", # v2
     page_icon="⚽",
     layout="wide"
 )
