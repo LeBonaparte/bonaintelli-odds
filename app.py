@@ -239,39 +239,7 @@ def calcular_margem(group):
     return (1 / group["odd"]).sum() - 1
 
 
-def build_game_card(jogo, status_tipo, status_label, melhor_margem_casa, melhor_margem_val, time_casa, time_fora, odd_casa, odd_fora, odd_empate, selecionado):
-    badge_class = "bi-live" if status_tipo == "ao_vivo" else "bi-soon"
-    card_class = "bi-game-card-sel" if selecionado else "bi-game-card"
-    return f"""
-    <div class="{card_class}">
-        <div class="bi-game-header">
-            <span class="bi-game-league">Brasileirão Série A</span>
-            <span class="{badge_class}">{status_label}</span>
-        </div>
-        <div class="bi-teams">
-            <div class="bi-team">
-                <div class="bi-team-name">{time_casa}</div>
-                <div class="bi-team-odd">{odd_casa:.2f}</div>
-            </div>
-            <div class="bi-vs">x</div>
-            <div class="bi-team">
-                <div class="bi-team-name">{time_fora}</div>
-                <div class="bi-team-odd">{odd_fora:.2f}</div>
-            </div>
-        </div>
-        <div class="bi-draw">
-            <span class="bi-draw-label">Empate</span>
-            <span class="bi-draw-odd">{odd_empate:.2f}</span>
-        </div>
-        <div class="bi-game-footer">
-            <span class="bi-game-time">Série A</span>
-            <div>
-                <div class="bi-best-label">menor margem</div>
-                <div class="bi-best-casa">{melhor_margem_casa} · {melhor_margem_val:.1f}%</div>
-            </div>
-        </div>
-    </div>
-    """
+
 
 
 # ── Buscar dados ─────────────────────────────────────────────────────────────
@@ -383,37 +351,99 @@ with col4:
 
 st.markdown('<div style="margin-bottom:8px;"></div>', unsafe_allow_html=True)
 
-# ── Cards de jogos ───────────────────────────────────────────────────────────
-st.markdown('<div class="bi-stitle">Jogos do dia — clique para selecionar</div>', unsafe_allow_html=True)
+# ── Seleção via dropdown ─────────────────────────────────────────────────────
+st.markdown('<div class="bi-stitle">Jogo selecionado</div>', unsafe_allow_html=True)
 
+# Montar opções do dropdown com status
 jogos_lista = jogos_info["jogo"].tolist()
-cols = st.columns(2)
-
-for i, jogo in enumerate(jogos_lista):
-    col = cols[i % 2]
+opcoes_dropdown = []
+for jogo in jogos_lista:
     data = jogos_info[jogos_info["jogo"] == jogo]["data"].iloc[0]
     status_tipo, status_label = status_jogo(data)
+    prefixo = "🔴" if status_tipo == "ao_vivo" else "🕐"
+    opcoes_dropdown.append(f"{prefixo} {jogo} · {status_label}")
 
-    df_j = df[df["jogo"] == jogo]
-    t_casa = jogo.split(" x ")[0]
-    t_fora = jogo.split(" x ")[1]
+jogos_map = dict(zip(opcoes_dropdown, jogos_lista))
+opcao_atual = next((k for k, v in jogos_map.items() if v == jogo_selecionado), opcoes_dropdown[0])
 
-    o_casa = df_j[df_j["resultado"] == t_casa]["odd"].max() if not df_j[df_j["resultado"] == t_casa].empty else 0
-    o_fora = df_j[df_j["resultado"] == t_fora]["odd"].max() if not df_j[df_j["resultado"] == t_fora].empty else 0
-    o_emp  = df_j[df_j["resultado"] == "Empate"]["odd"].max() if not df_j[df_j["resultado"] == "Empate"].empty else 0
+opcao_escolhida = st.selectbox(
+    "Selecione o jogo",
+    options=opcoes_dropdown,
+    index=opcoes_dropdown.index(opcao_atual),
+    label_visibility="collapsed"
+)
 
-    marg_jogo = margem_df[margem_df["jogo"] == jogo].sort_values("margem")
-    melhor_casa_m = marg_jogo.iloc[0]["casa"] if not marg_jogo.empty else "-"
-    melhor_val_m  = marg_jogo.iloc[0]["margem"] if not marg_jogo.empty else 0
+if jogos_map[opcao_escolhida] != jogo_selecionado:
+    st.session_state.jogo_selecionado = jogos_map[opcao_escolhida]
+    jogo_selecionado = jogos_map[opcao_escolhida]
+else:
+    jogo_selecionado = jogos_map[opcao_escolhida]
 
-    selecionado = jogo == jogo_selecionado
+# Card do jogo selecionado
+data_sel = jogos_info[jogos_info["jogo"] == jogo_selecionado]["data"].iloc[0]
+status_tipo_sel, status_label_sel = status_jogo(data_sel)
+t_casa_sel = jogo_selecionado.split(" x ")[0]
+t_fora_sel = jogo_selecionado.split(" x ")[1]
+df_j_sel = df[df["jogo"] == jogo_selecionado]
+o_casa_sel = df_j_sel[df_j_sel["resultado"] == t_casa_sel]["odd"].max() if not df_j_sel[df_j_sel["resultado"] == t_casa_sel].empty else 0
+o_fora_sel = df_j_sel[df_j_sel["resultado"] == t_fora_sel]["odd"].max() if not df_j_sel[df_j_sel["resultado"] == t_fora_sel].empty else 0
+o_emp_sel  = df_j_sel[df_j_sel["resultado"] == "Empate"]["odd"].max() if not df_j_sel[df_j_sel["resultado"] == "Empate"].empty else 0
+marg_sel = margem_df[margem_df["jogo"] == jogo_selecionado].sort_values("margem")
+melhor_casa_sel = marg_sel.iloc[0]["casa"] if not marg_sel.empty else "-"
+melhor_val_sel  = marg_sel.iloc[0]["margem"] if not marg_sel.empty else 0
 
-    with col:
-        card_html = build_game_card(jogo, status_tipo, status_label, melhor_casa_m, melhor_val_m, t_casa, t_fora, o_casa, o_fora, o_emp, selecionado)
-        st.markdown(card_html, unsafe_allow_html=True)
-        if st.button(f"Selecionar", key=f"btn_{i}", use_container_width=True):
-            st.session_state.jogo_selecionado = jogo
-            st.rerun()
+badge_html = '<span style="background:rgba(196,38,29,0.15);border:1px solid #c4261d;color:#ff5544;font-size:10px;padding:2px 8px;border-radius:20px;">' + status_label_sel + '</span>' if status_tipo_sel == "ao_vivo" else '<span style="background:rgba(196,98,29,0.1);border:1px solid #C4621D55;color:#C4621D;font-size:10px;padding:2px 8px;border-radius:20px;">' + status_label_sel + '</span>'
+
+# Bloco de placar (só ao vivo)
+score_html = ""
+if status_tipo_sel == "ao_vivo":
+    minutos = int(abs((datetime.now(timezone.utc) - data_sel).total_seconds() / 60))
+    score_html = f"""
+    <div style="background:#0D1B2A;border:1px solid #C4621D33;border-radius:8px;padding:10px 16px;margin:10px 0;display:flex;align-items:center;justify-content:space-between;">
+        <div style="text-align:center;flex:1;">
+            <div style="font-size:10px;color:#8A9BB0;margin-bottom:4px;">{t_casa_sel}</div>
+            <div style="font-size:28px;font-weight:700;color:#fff;">—</div>
+        </div>
+        <div style="text-align:center;">
+            <div style="font-size:10px;color:#ff5544;">{minutos}'</div>
+            <div style="font-size:18px;color:#8A9BB0;margin:2px 12px;">x</div>
+            <div style="font-size:9px;color:#8A9BB0;text-transform:uppercase;letter-spacing:1px;">ao vivo</div>
+        </div>
+        <div style="text-align:center;flex:1;">
+            <div style="font-size:10px;color:#8A9BB0;margin-bottom:4px;">{t_fora_sel}</div>
+            <div style="font-size:28px;font-weight:700;color:#fff;">—</div>
+        </div>
+    </div>
+    <div style="font-size:10px;color:#8A9BB0;text-align:center;margin-bottom:8px;">Placar em tempo real requer integração com API-Football</div>"""
+
+st.markdown(f"""
+<div style="background:#152236;border:1px solid #C4621D;border-radius:10px;padding:14px;margin-bottom:14px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+        <span style="font-size:11px;color:#8A9BB0;">Brasileirão Série A</span>
+        {badge_html}
+    </div>
+    {score_html}
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+        <div style="text-align:center;flex:1;">
+            <div style="font-size:13px;font-weight:500;color:#fff;">{t_casa_sel}</div>
+            <div style="font-size:20px;font-weight:600;color:#C4621D;margin-top:4px;">{o_casa_sel:.2f}</div>
+        </div>
+        <div style="color:#8A9BB0;font-size:12px;padding:0 12px;">x</div>
+        <div style="text-align:center;flex:1;">
+            <div style="font-size:13px;font-weight:500;color:#fff;">{t_fora_sel}</div>
+            <div style="font-size:20px;font-weight:600;color:#C4621D;margin-top:4px;">{o_fora_sel:.2f}</div>
+        </div>
+    </div>
+    <div style="display:flex;justify-content:center;gap:8px;align-items:center;">
+        <span style="font-size:11px;color:#8A9BB0;">Empate</span>
+        <span style="font-size:14px;color:#fff;font-weight:500;">{o_emp_sel:.2f}</span>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;border-top:1px solid #1E3148;padding-top:8px;">
+        <span style="font-size:10px;color:#8A9BB0;">Série A 2026</span>
+        <span style="font-size:10px;color:#C4621D;">menor margem: {melhor_casa_sel} · {melhor_val_sel:.1f}%</span>
+    </div>
+</div>
+""", unsafe_allow_html=True)
 
 # ── Odds detalhadas ──────────────────────────────────────────────────────────
 st.markdown(f'<div class="bi-stitle">Odds detalhadas · {jogo_selecionado}</div>', unsafe_allow_html=True)
