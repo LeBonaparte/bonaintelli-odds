@@ -392,58 +392,31 @@ marg_sel = margem_df[margem_df["jogo"] == jogo_selecionado].sort_values("margem"
 melhor_casa_sel = marg_sel.iloc[0]["casa"] if not marg_sel.empty else "-"
 melhor_val_sel  = marg_sel.iloc[0]["margem"] if not marg_sel.empty else 0
 
-badge_html = '<span style="background:rgba(196,38,29,0.15);border:1px solid #c4261d;color:#ff5544;font-size:10px;padding:2px 8px;border-radius:20px;">' + status_label_sel + '</span>' if status_tipo_sel == "ao_vivo" else '<span style="background:rgba(196,98,29,0.1);border:1px solid #C4621D55;color:#C4621D;font-size:10px;padding:2px 8px;border-radius:20px;">' + status_label_sel + '</span>'
+# Montar card do jogo selecionado
+badge_cor = "#ff5544" if status_tipo_sel == "ao_vivo" else "#C4621D"
+badge_bg  = "rgba(196,38,29,0.15)" if status_tipo_sel == "ao_vivo" else "rgba(196,98,29,0.1)"
+badge_bd  = "#c4261d" if status_tipo_sel == "ao_vivo" else "#C4621D55"
 
-# Bloco de placar (só ao vivo)
-score_html = ""
+card_parts = []
+card_parts.append(f'''<div style="background:#152236;border:1px solid #C4621D;border-radius:10px;padding:14px;margin-bottom:14px;">''')
+card_parts.append(f'''<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;"><span style="font-size:11px;color:#8A9BB0;">Brasileirao Serie A</span><span style="background:{badge_bg};border:1px solid {badge_bd};color:{badge_cor};font-size:10px;padding:2px 8px;border-radius:20px;">{status_label_sel}</span></div>''')
+
 if status_tipo_sel == "ao_vivo":
     minutos = int(abs((datetime.now(timezone.utc) - data_sel).total_seconds() / 60))
-    score_html = f"""
-    <div style="background:#0D1B2A;border:1px solid #C4621D33;border-radius:8px;padding:10px 16px;margin:10px 0;display:flex;align-items:center;justify-content:space-between;">
-        <div style="text-align:center;flex:1;">
-            <div style="font-size:10px;color:#8A9BB0;margin-bottom:4px;">{t_casa_sel}</div>
-            <div style="font-size:28px;font-weight:700;color:#fff;">—</div>
-        </div>
-        <div style="text-align:center;">
-            <div style="font-size:10px;color:#ff5544;">{minutos}'</div>
-            <div style="font-size:18px;color:#8A9BB0;margin:2px 12px;">x</div>
-            <div style="font-size:9px;color:#8A9BB0;text-transform:uppercase;letter-spacing:1px;">ao vivo</div>
-        </div>
-        <div style="text-align:center;flex:1;">
-            <div style="font-size:10px;color:#8A9BB0;margin-bottom:4px;">{t_fora_sel}</div>
-            <div style="font-size:28px;font-weight:700;color:#fff;">—</div>
-        </div>
-    </div>
-    <div style="font-size:10px;color:#8A9BB0;text-align:center;margin-bottom:8px;">Placar em tempo real requer integração com API-Football</div>"""
+    card_parts.append(f'''<div style="background:#0D1B2A;border:1px solid #2a3d52;border-radius:8px;padding:12px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;"><div style="text-align:center;flex:1;"><div style="font-size:10px;color:#8A9BB0;margin-bottom:4px;">{t_casa_sel}</div><div style="font-size:28px;font-weight:700;color:#fff;">-</div></div><div style="text-align:center;"><div style="font-size:10px;color:#ff5544;">{minutos} min</div><div style="font-size:16px;color:#8A9BB0;margin:4px 12px;">x</div><div style="font-size:9px;color:#8A9BB0;">ao vivo</div></div><div style="text-align:center;flex:1;"><div style="font-size:10px;color:#8A9BB0;margin-bottom:4px;">{t_fora_sel}</div><div style="font-size:28px;font-weight:700;color:#fff;">-</div></div></div>''')
+    card_parts.append('<div style="font-size:10px;color:#8A9BB0;text-align:center;margin-bottom:10px;">Placar requer integracao com API-Football</div>')
 
-st.markdown(f"""
-<div style="background:#152236;border:1px solid #C4621D;border-radius:10px;padding:14px;margin-bottom:14px;">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-        <span style="font-size:11px;color:#8A9BB0;">Brasileirão Série A</span>
-        {badge_html}
-    </div>
-    {score_html}
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-        <div style="text-align:center;flex:1;">
-            <div style="font-size:13px;font-weight:500;color:#fff;">{t_casa_sel}</div>
-            <div style="font-size:20px;font-weight:600;color:#C4621D;margin-top:4px;">{o_casa_sel:.2f}</div>
-        </div>
-        <div style="color:#8A9BB0;font-size:12px;padding:0 12px;">x</div>
-        <div style="text-align:center;flex:1;">
-            <div style="font-size:13px;font-weight:500;color:#fff;">{t_fora_sel}</div>
-            <div style="font-size:20px;font-weight:600;color:#C4621D;margin-top:4px;">{o_fora_sel:.2f}</div>
-        </div>
-    </div>
-    <div style="display:flex;justify-content:center;gap:8px;align-items:center;">
-        <span style="font-size:11px;color:#8A9BB0;">Empate</span>
-        <span style="font-size:14px;color:#fff;font-weight:500;">{o_emp_sel:.2f}</span>
-    </div>
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;border-top:1px solid #1E3148;padding-top:8px;">
-        <span style="font-size:10px;color:#8A9BB0;">Série A 2026</span>
-        <span style="font-size:10px;color:#C4621D;">menor margem: {melhor_casa_sel} · {melhor_val_sel:.1f}%</span>
-    </div>
-</div>
-""", unsafe_allow_html=True)
+o_casa_fmt = f"{o_casa_sel:.2f}"
+o_fora_fmt = f"{o_fora_sel:.2f}"
+o_emp_fmt  = f"{o_emp_sel:.2f}"
+marg_fmt   = f"{melhor_val_sel:.1f}"
+
+card_parts.append(f'''<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;"><div style="text-align:center;flex:1;"><div style="font-size:13px;font-weight:500;color:#fff;">{t_casa_sel}</div><div style="font-size:20px;font-weight:600;color:#C4621D;margin-top:4px;">{o_casa_fmt}</div></div><div style="color:#8A9BB0;font-size:12px;padding:0 12px;">x</div><div style="text-align:center;flex:1;"><div style="font-size:13px;font-weight:500;color:#fff;">{t_fora_sel}</div><div style="font-size:20px;font-weight:600;color:#C4621D;margin-top:4px;">{o_fora_fmt}</div></div></div>''')
+card_parts.append(f'''<div style="display:flex;justify-content:center;gap:8px;align-items:center;"><span style="font-size:11px;color:#8A9BB0;">Empate</span><span style="font-size:14px;color:#fff;font-weight:500;">{o_emp_fmt}</span></div>''')
+card_parts.append(f'''<div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;border-top:1px solid #1E3148;padding-top:8px;"><span style="font-size:10px;color:#8A9BB0;">Serie A 2026</span><span style="font-size:10px;color:#C4621D;">menor margem: {melhor_casa_sel} · {marg_fmt}%</span></div>''')
+card_parts.append('</div>')
+
+st.markdown("".join(card_parts), unsafe_allow_html=True)
 
 # ── Odds detalhadas ──────────────────────────────────────────────────────────
 st.markdown(f'<div class="bi-stitle">Odds detalhadas · {jogo_selecionado}</div>', unsafe_allow_html=True)
