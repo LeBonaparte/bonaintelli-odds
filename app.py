@@ -121,11 +121,22 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ── Casas BR ─────────────────────────────────────────────────────────────────
+# ✅ Confirmadas — funcionam para brasileiros (Mai/2026)
 CASAS_BR = [
-    "Betsson", "888sport", "Pinnacle", "Marathon Bet", "BetMGM",
-    "Unibet (NL)", "Unibet (UK)", "Unibet (SE)", "Coolbet",
-    "Betfair", "Matchbook", "1xBet", "Everygame", "BetOnline.ag",
-    "Winamax (FR)", "Winamax (DE)", "FanDuel", "DraftKings",
+    "Matchbook",     # Exchange — confirmada
+    "Pinnacle",      # Confirmada
+    "Coolbet",       # Confirmada
+    "LowVig.ag",     # Confirmada
+    "BetMGM",        # Licença brasileira
+    "888sport",      # Confirmada
+    "BetOnline.ag",  # Confirmada
+    "Betsson",       # Licença SIGAP
+    "Nordic Bet",    # Confirmada
+    "Unibet (SE)",   # Confirmada
+    "Unibet (NL)",   # Confirmada
+    "Unibet (UK)",   # Confirmada
+    "Marathon Bet",  # Confirmada
+    "FanDuel",       # Confirmada
 ]
 
 URLS_CASAS = {
@@ -145,7 +156,7 @@ URLS_CASAS = {
     "BetOnline.ag":   "https://www.betonline.ag/sportsbook/soccer/brazil",
     "Everygame":      "https://www.everygame.com/sports-betting/soccer/south-america/brazil-serie-a",
     "Betsson":        "https://www.betsson.com/en/sportsbook/football/brazil",
-    "Nordic Bet":     "https://www.nordicbet.com/en/sports/football",
+    "Nordic Bet":     "https://www.nordicbet.com/en",
     "Unibet":         "https://www.unibet.com/betting/sports/filter/football",
     "Unibet (UK)":    "https://www.unibet.co.uk/betting/odds/football",
     "Unibet (SE)":    "https://www.unibet.se/betting/sports/filter/football",
@@ -155,10 +166,10 @@ URLS_CASAS = {
     "Casumo":         "https://www.casumo.com/en/sports/football/",
     "Bet Victor":     "https://www.betvictor.com/en-gb/sport/football",
     "Betclic (FR)":   "https://www.betclic.fr/football-s1/",
-    "LeoVegas (SE)":  "https://www.leovegas.com/en-se/sports/football/",
-    "PMU (FR)":       "https://www.pmu.fr/paris-sportifs/football/",
+    "LeoVegas (SE)":  "https://www.leovegas.com/en/sports/football/",
+    "PMU (FR)":       "https://www.pmu.fr/turf/",
     "Tipico":         "https://www.tipico.com/en/sports/soccer/",
-    "William Hill":   "https://www.williamhill.com/football/",
+    "William Hill":   "https://www.william-hill.com/sports/football",
     "Coral":          "https://www.coral.co.uk/sport/football/",
     "Paddy Power":    "https://www.paddypower.com/football/",
     "BoyleSports":    "https://www.boylesports.com/sports/football/",
@@ -166,11 +177,18 @@ URLS_CASAS = {
     "LiveScore Bet":  "https://www.livescorebet.com/sports/football/",
     "Sky Bet":        "https://www.skybet.com/football/",
     "Smarkets":       "https://smarkets.com/sport/football/",
-    "LowVig.ag":      "https://www.lowvig.ag/sports/soccer/",
-    "BetRivers":      "https://www.betrivers.com/sports/soccer/",
+    "LowVig.ag":      "https://www.lowvig.ag/sports/soccer/brazil",
+    "BetRivers":      "https://www.betrivers.com/sports/soccer/brazil-serie-a",
     "Virgin Bet":     "https://www.virginbet.com/sport/football/",
     "Neds":           "https://www.neds.com.au/sports/soccer/",
-    "PlayUp":         "https://www.playup.com/au/sport/soccer/",
+    "PlayUp":         "https://www.playup.com/sports/soccer/",
+    "Everygame":      "https://www.everygame.com/sports-betting/soccer/",
+    "BetUS":          "https://www.betus.com.pa/sports/soccer/",
+    "BetAnything":    "https://www.betanything.com/",
+    "Codere (IT)":    "https://www.codere.it/",
+    "TABtouch":       "https://www.tabtouch.com.au/sports/soccer/",
+    "Betfair":        "https://www.betfair.com/sport/football/",
+    "Betfred":        "https://www.betfred.com/sports/football/",
 }
 
 TIMES_SERIE_A = [
@@ -276,9 +294,9 @@ for dt in sorted(df["data"].unique()):
     if -2 <= diff_h <= 2:
         ttl_label = "5 min"; break
     elif diff_h <= 24:
-        ttl_label = "2h"; break
+        ttl_label = "3h"; break
     elif diff_h <= 48:
-        ttl_label = "6h"; break
+        ttl_label = "12h"; break
 
 # ── Header ───────────────────────────────────────────────────────────────────
 agora_br = datetime.now(timezone.utc) - timedelta(hours=3)
