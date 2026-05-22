@@ -531,6 +531,15 @@ with col_incert:
 
 # ── Ranking de casas ─────────────────────────────────────────────────────────
 st.markdown('<div class="bi-stitle">Ranking de casas · menor margem</div>', unsafe_allow_html=True)
+
+st.markdown("""
+<div style="background:#111f30;border:1px solid #1E3148;border-left:3px solid #C4621D44;border-radius:8px;padding:10px 14px;margin-bottom:12px;font-size:12px;color:#8A9BB0;line-height:1.7;">
+    A <strong style="color:#C4621D;font-weight:500;">margem da casa</strong> é o percentual que a bookmaker retém independente do resultado — quanto menor, mais justa ela é para o apostador.
+    Uma margem de <strong style="color:#C4621D;font-weight:500;">5%</strong> significa que para cada R$100 apostados, a casa fica com R$5 em média.
+    As <strong style="color:#C4621D;font-weight:500;">exchanges</strong> (Betfair, Matchbook) têm margem próxima de zero pois cobram comissão apenas sobre os ganhos.
+</div>
+""", unsafe_allow_html=True)
+
 st.markdown('<div class="bi-panel">', unsafe_allow_html=True)
 st.markdown('<div class="bi-panel-sub">Casas com menor margem são mais justas para o apostador</div>', unsafe_allow_html=True)
 
