@@ -203,6 +203,7 @@ TIMES_SERIE_A = [
 # ── Funções ──────────────────────────────────────────────────────────────────
 def status_jogo(data):
     agora = datetime.now(timezone.utc)
+    data_br = data.astimezone(timezone(timedelta(hours=-3)))
     diff = (agora - data).total_seconds() / 60
     if diff < 0:
         minutos = int(abs((data - agora).total_seconds() / 60))
@@ -210,8 +211,11 @@ def status_jogo(data):
             return "em_breve", f"Em breve · {minutos}min"
         horas = int(minutos / 60)
         if horas < 24:
-            return "em_breve", f"Hoje · {data.astimezone(timezone(timedelta(hours=-3))).strftime('%H:%M')}"
-        return "amanha", f"Amanhã · {data.astimezone(timezone(timedelta(hours=-3))).strftime('%H:%M')}"
+            return "em_breve", f"Hoje · {data_br.strftime('%H:%M')}"
+        elif horas < 48:
+            return "amanha", f"Amanhã · {data_br.strftime('%H:%M')}"
+        else:
+            return "amanha", f"{data_br.strftime('%d/%m')} · {data_br.strftime('%H:%M')}"
     elif diff <= 120:
         return "ao_vivo", f"Ao vivo · {int(diff)}'"
     return "encerrado", "Encerrado"
